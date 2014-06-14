@@ -5,27 +5,22 @@
 #include <QAction>
 #include <QMenu>
 #include <QMenuBar>
-#include <QSpinBox>
 #include <QWidget>
-
+#include "rotspinbox.h"
 #include "rotimage.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     ROTimage *tes = new ROTimage();
-    tes->openFilename();
+//    tes->openFilename();
 
-    QSpinBox *spinbox_Xstart = new QSpinBox();
-    QSpinBox *spinbox_Xend = new QSpinBox();
-    QSpinBox *spinbox_Ystart = new QSpinBox();
-    QSpinBox *spinbox_Yend = new QSpinBox();
+    ROTSpinBox *spinbox_Xstart = new ROTSpinBox();
+    ROTSpinBox *spinbox_Xend = new ROTSpinBox();
+    ROTSpinBox *spinbox_Ystart = new ROTSpinBox();
+    ROTSpinBox *spinbox_Yend = new ROTSpinBox();
     QLabel *label_start = new QLabel("Grabut Start Point (x,y)");
     QLabel *label_end = new QLabel("Grabut End Point (x,y)");
-    spinbox_Yend->setMaximum(tes->getHeight());
-    spinbox_Xend->setMaximum(tes->getWidth());
-    spinbox_Xstart->setMaximum(tes->getWidth());
-    spinbox_Ystart->setMaximum(tes->getHeight());
 
     QPushButton *button_file = new QPushButton("Open File");
     QPushButton *button_grabcut = new QPushButton("Apply Grabcut");
@@ -51,8 +46,12 @@ int main(int argc, char *argv[])
     display->setLayout(layout);
     display->show();
 
- //   QObject::connect(tes,SIGNAL(imageWidth(int)),spinbox_Xend,SLOT(setValue(int)));
- //   QObject::connect(tes,SIGNAL(imageHeight(int)),spinbox_Yend,SLOT(setValue(int)));
+    QObject::connect(tes,SIGNAL(imageWidth(int)),spinbox_Xstart,SLOT(setValueMax(int)));
+    QObject::connect(tes,SIGNAL(imageWidth(int)),spinbox_Xend,SLOT(setValueMax(int)));
+    QObject::connect(tes,SIGNAL(imageHeight(int)),spinbox_Ystart,SLOT(setValueMax(int)));
+    QObject::connect(tes,SIGNAL(imageHeight(int)),spinbox_Yend,SLOT(setValueMax(int)));
+    QObject::connect(tes,SIGNAL(imageWidth(int)),spinbox_Xend,SLOT(setValue(int)));
+    QObject::connect(tes,SIGNAL(imageHeight(int)),spinbox_Yend,SLOT(setValue(int)));
     QObject::connect(spinbox_Xstart,SIGNAL(valueChanged(int)),tes,SLOT(setGrabcut_Xbegin(int)));
     QObject::connect(spinbox_Ystart,SIGNAL(valueChanged(int)),tes,SLOT(setGrabcut_Ybegin(int)));
     QObject::connect(spinbox_Xend,SIGNAL(valueChanged(int)),tes,SLOT(setGrabcut_Xend(int)));

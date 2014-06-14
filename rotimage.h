@@ -21,7 +21,7 @@ signals:
     void imageHeight(int height);
 
 public slots:
-    void openFilename();
+    int openFilename();
     void drawOverlay();
     void drawGrabcut();
     void applyGrabcut();

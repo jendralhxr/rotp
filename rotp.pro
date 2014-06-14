@@ -22,7 +22,9 @@ TARGET = rotp
 TEMPLATE = app
 
 SOURCES += main.cpp\
-    rotimage.cpp
+    rotimage.cpp \
+    rotspinbox.cpp
 
 HEADERS  += \
-    rotimage.h
+    rotimage.h \
+    rotspinbox.h

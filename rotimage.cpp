@@ -1,22 +1,25 @@
 #include "rotimage.h"
+#include <stdlib.h>
+#include <math.h>
 #include <QFileDialog>
+#include <QMessageBox>
+
 #define MAX_WIDTH 1280
 #define MAX_HEIGHT 720
 #define CENTROID_SAMPLE_COUNT 60
 #define OVERLAY_COLOR 0,0,200 // dead blue
 #define GRABCUT_COLOR 200,0,0 // dead red
 #define TOLERANCE 0.05  // tolerance, proportional to image hypotenuse
-#include <stdlib.h>
-#include <math.h>
 
 ROTimage::ROTimage(QWidget *parent) : QLabel(parent)
 {
 }
 
-void ROTimage::openFilename(){
+int ROTimage::openFilename(){
     image= cv::imread(QFileDialog::getOpenFileName().toStdString());
     if(!image.data || image.cols>MAX_WIDTH || image.rows>MAX_HEIGHT) {
         qDebug("File not found or invalid.");
+        return(1);
     }
     else{
         emit imageWidth(image.cols);
@@ -26,6 +29,7 @@ void ROTimage::openFilename(){
         intersect_x[2] = 2*image.cols/3; intersect_y[2] = image.rows/3;
         intersect_x[3] = 2*image.cols/3; intersect_y[3] = 2*image.rows/3;
         renderImage();
+        return(0);
     }
 }
 
@@ -124,6 +128,7 @@ void ROTimage::setGrabcut_Yend(int pixel){
 }
 
 int ROTimage::checkRuleofThird(){
+    QString string;
     // srand(some_random_number), please
     double x_acc, y_acc;
     int x_temp, y_temp;
@@ -131,7 +136,7 @@ int ROTimage::checkRuleofThird(){
     while(count<CENTROID_SAMPLE_COUNT){
         x_temp = rand()%image.cols;
         y_temp = rand()%image.rows;
-        qDebug("%d %d %d",count, x_temp, y_temp);
+        // qDebug("%d %d %d",count, x_temp, y_temp);
         cv::Scalar colour = image.at<uchar>(y_temp, x_temp);
         if (colour.val[0]==255){ // the pixel[temp] is white!!
             x_acc += x_temp;
