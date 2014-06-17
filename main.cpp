@@ -22,11 +22,11 @@ int main(int argc, char *argv[])
     QLabel *label_start = new QLabel("Grabut Start Point (x,y)");
     QLabel *label_end = new QLabel("Grabut End Point (x,y)");
 
-    QPushButton *button_file = new QPushButton("Open File");
+    QPushButton *button_file = new QPushButton("Open Image");
     QPushButton *button_grabcut = new QPushButton("Apply Grabcut");
-    QPushButton *button_otsu = new QPushButton("Apply Gray+Otsu");
-    QPushButton *button_overlay = new QPushButton("Draw RoT Overlay");
-    QPushButton *button_rot = new QPushButton("Rule of Third Check");
+    QPushButton *button_otsu = new QPushButton("Apply Grayscale and Otsu Threshold");
+    QPushButton *button_overlay = new QPushButton("Draw Rule of Thirds Overlay");
+    QPushButton *button_rot = new QPushButton("Rule of Thirds Check");
 
     QGridLayout *layout = new QGridLayout();
     layout->addWidget(button_file,0,0,1,2,Qt::AlignLeft);

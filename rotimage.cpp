@@ -4,9 +4,10 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDateTime>
+#include <QPen>
 
-#define MAX_WIDTH 1280
-#define MAX_HEIGHT 720
+#define MAX_WIDTH 640
+#define MAX_HEIGHT 480
 #define CENTROID_SAMPLE_COUNT 60.f
 #define OVERLAY_COLOR 0,0,200 // dead blue
 #define GRABCUT_COLOR 200,0,0 // dead red
@@ -27,7 +28,9 @@ ROTimage::ROTimage(QWidget *parent) : QLabel(parent)
 }
 
 int ROTimage::openFilename(){
-    image= cv::imread(QFileDialog::getOpenFileName().toStdString());
+    image= cv::imread(QFileDialog::getOpenFileName(this,tr("Open Image"), ".",
+                                                   tr("Image Files (*.JPEG; *.JPG; *.BMP; *.PNG)")).toStdString());
+   // QString fileName = QFileDialog::getOpenFileName();
     if(!image.data || image.cols>MAX_WIDTH || image.rows>MAX_HEIGHT) {
         qDebug("File not found or invalid.");
         return(1);
@@ -90,6 +93,13 @@ void ROTimage::applyGrayOtsu(){
 void ROTimage::drawOverlay(){
     //    assert(image.isContinuous());
     //    disp= QImage(image.data, image.cols, image.rows, image.cols*3, QImage::Format_RGB888);
+    QPen pen;
+    painter.begin(&disp);
+    pen.setColor(qRgb(OVERLAY_COLOR));
+    pen.setWidth(2);
+    painter.setPen(pen);
+
+
     painter.begin(&disp);
     painter.setPen(qRgb(OVERLAY_COLOR));
     painter.drawLine(0, image.rows/3,   image.cols, image.rows/3);
@@ -103,8 +113,12 @@ void ROTimage::drawOverlay(){
 
 void ROTimage::drawGrabcut(){
     renderImage();
+    QPen pen;
     painter.begin(&disp);
-    painter.setPen(qRgb(GRABCUT_COLOR));
+    pen.setColor(qRgb(GRABCUT_COLOR));
+    pen.setWidth(2);
+    painter.setPen(pen);
+
     painter.drawLine(grabcut_xbegin, grabcut_ybegin, grabcut_xbegin, grabcut_yend);
     painter.drawLine(grabcut_xend  , grabcut_ybegin, grabcut_xend  , grabcut_yend);
     painter.drawLine(grabcut_xbegin, grabcut_ybegin, grabcut_xend  , grabcut_ybegin);
@@ -141,8 +155,8 @@ void ROTimage::setGrabcut_Yend(int pixel){
 int ROTimage::checkRuleofThird(){
     QString string;
     QMessageBox messagebox;
-    srand(QDateTime::currentMSecsSinceEpoch());
-
+    //srand(QDateTime::currentMSecsSinceEpoch());
+    //qDebug("date %lld",QDateTime::currentMSecsSinceEpoch());
     while(count<CENTROID_SAMPLE_COUNT){
         x_temp = rand()%image.cols;
         y_temp = rand()%image.rows;
@@ -165,28 +179,28 @@ int ROTimage::checkRuleofThird(){
         distance = sqrt(pow(centroid_x-intersect_x[i],2) \
                         + sqrt(pow(centroid_y-intersect_y[i],2)));
         if (distance < TOLERANCE0*hypotenuse){
-            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f,%.2f), distance %.2f px, score %d"\
+            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f, %.2f), distance %.2f px, score %d"\
                                               ,centroid_x,centroid_y,distance,SCORE0));
             messagebox.exec();
             return(0);
         }
         if (distance < TOLERANCE1*hypotenuse){
-            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f,%.2f), distance %.2f px, score %d"\
+            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f, %.2f), distance %.2f px, score %d"\
                                               ,centroid_x,centroid_y,distance,SCORE1));
             messagebox.exec();
             return(0);
         }if (distance < TOLERANCE2*hypotenuse){
-            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f,%.2f), distance %.2f px, score %d"\
+            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f, %.2f), distance %.2f px, score %d"\
                                               ,centroid_x,centroid_y,distance,SCORE2));
             messagebox.exec();
             return(0);
         }if (distance < TOLERANCE3*hypotenuse){
-            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f,%.2f), distance %.2f px, score %d"\
+            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f, %.2f), distance %.2f px, score %d"\
                                               ,centroid_x,centroid_y,distance,SCORE3));
             messagebox.exec();
             return(0);
         }if (distance < TOLERANCE4*hypotenuse){
-            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f,%.2f), distance %.2f px, score %d"\
+            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f, %.2f), distance %.2f px, score %d"\
                                               ,centroid_x,centroid_y,distance,SCORE4));
             messagebox.exec();
             return(0);
