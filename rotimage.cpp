@@ -3,18 +3,19 @@
 #include <math.h>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QDateTime>
 
 #define MAX_WIDTH 1280
 #define MAX_HEIGHT 720
-#define CENTROID_SAMPLE_COUNT 60
+#define CENTROID_SAMPLE_COUNT 60.f
 #define OVERLAY_COLOR 0,0,200 // dead blue
 #define GRABCUT_COLOR 200,0,0 // dead red
 // tolerance, proportional to image hypotenuse, for grading
-#define TOLERANCE0 0.02
-#define TOLERANCE1 0.05
-#define TOLERANCE2 0.10
-#define TOLERANCE3 0.15
-#define TOLERANCE4 0.20
+#define TOLERANCE0 0.01
+#define TOLERANCE1 0.02
+#define TOLERANCE2 0.05
+#define TOLERANCE3 0.05
+#define TOLERANCE4 0.10
 #define SCORE0 100
 #define SCORE1 95
 #define SCORE2 90
@@ -140,23 +141,23 @@ void ROTimage::setGrabcut_Yend(int pixel){
 int ROTimage::checkRuleofThird(){
     QString string;
     QMessageBox messagebox;
-    // srand(some_random_number), please
-    double x_acc, y_acc;
-    int x_temp, y_temp;
-    int count=0;
+    srand(QDateTime::currentMSecsSinceEpoch());
+
     while(count<CENTROID_SAMPLE_COUNT){
         x_temp = rand()%image.cols;
         y_temp = rand()%image.rows;
-        // qDebug("%d %d %d",count, x_temp, y_temp);
+        // qDebug("temp %d %d %d",count, x_temp, y_temp);
         cv::Scalar colour = image.at<uchar>(y_temp, x_temp);
         if (colour.val[0]==255){ // the pixel[temp] is white!!
-            x_acc += x_temp;
-            y_acc += y_temp;
+            x_acc = x_acc + double(x_temp);
+            y_acc = y_acc + double(y_temp);
+          //  qDebug("temp %d %d %d",count, x_temp, y_temp);
+          //  qDebug("acc %d %.2f %.2f",count, x_acc, y_acc);
             count++;
         }
     }
-    centroid_x = x_acc/CENTROID_SAMPLE_COUNT;
-    centroid_y = y_acc/CENTROID_SAMPLE_COUNT;
+    centroid_x = x_acc/ (double) CENTROID_SAMPLE_COUNT;
+    centroid_y = y_acc/ (double) CENTROID_SAMPLE_COUNT;
     qDebug("Centroid (x,y): %f %f",centroid_x,centroid_y);
     double hypotenuse = sqrt(pow(image.cols,2) + pow(image.rows,2));
     double distance;

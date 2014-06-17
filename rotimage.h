@@ -47,6 +47,9 @@ private:
     cv::Mat image, tmp;
     QImage disp;
     QPainter painter;
+    double x_acc, y_acc;
+    int x_temp, y_temp;
+    int count;
 
 };
 
