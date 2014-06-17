@@ -9,7 +9,17 @@
 #define CENTROID_SAMPLE_COUNT 60
 #define OVERLAY_COLOR 0,0,200 // dead blue
 #define GRABCUT_COLOR 200,0,0 // dead red
-#define TOLERANCE 0.05  // tolerance, proportional to image hypotenuse
+// tolerance, proportional to image hypotenuse, for grading
+#define TOLERANCE0 0.02
+#define TOLERANCE1 0.05
+#define TOLERANCE2 0.10
+#define TOLERANCE3 0.15
+#define TOLERANCE4 0.20
+#define SCORE0 100
+#define SCORE1 95
+#define SCORE2 90
+#define SCORE3 80
+#define SCORE4 75
 
 ROTimage::ROTimage(QWidget *parent) : QLabel(parent)
 {
@@ -129,6 +139,7 @@ void ROTimage::setGrabcut_Yend(int pixel){
 
 int ROTimage::checkRuleofThird(){
     QString string;
+    QMessageBox messagebox;
     // srand(some_random_number), please
     double x_acc, y_acc;
     int x_temp, y_temp;
@@ -152,12 +163,36 @@ int ROTimage::checkRuleofThird(){
     for (int i=0; i<4; i++){
         distance = sqrt(pow(centroid_x-intersect_x[i],2) \
                         + sqrt(pow(centroid_y-intersect_y[i],2)));
-        if (distance < TOLERANCE*hypotenuse){
-            qDebug("Rule of Third: Yes, distance %f px",distance);
+        if (distance < TOLERANCE0*hypotenuse){
+            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f,%.2f), distance %.2f px, score %d"\
+                                              ,centroid_x,centroid_y,distance,SCORE0));
+            messagebox.exec();
+            return(0);
+        }
+        if (distance < TOLERANCE1*hypotenuse){
+            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f,%.2f), distance %.2f px, score %d"\
+                                              ,centroid_x,centroid_y,distance,SCORE1));
+            messagebox.exec();
+            return(0);
+        }if (distance < TOLERANCE2*hypotenuse){
+            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f,%.2f), distance %.2f px, score %d"\
+                                              ,centroid_x,centroid_y,distance,SCORE2));
+            messagebox.exec();
+            return(0);
+        }if (distance < TOLERANCE3*hypotenuse){
+            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f,%.2f), distance %.2f px, score %d"\
+                                              ,centroid_x,centroid_y,distance,SCORE3));
+            messagebox.exec();
+            return(0);
+        }if (distance < TOLERANCE4*hypotenuse){
+            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f,%.2f), distance %.2f px, score %d"\
+                                              ,centroid_x,centroid_y,distance,SCORE4));
+            messagebox.exec();
             return(0);
         }
     }
-    qDebug("Rule of Third: No");
+    messagebox.setText(string.sprintf("Rule of Third: No"));
+    messagebox.exec();
     return(1);
 }
 
