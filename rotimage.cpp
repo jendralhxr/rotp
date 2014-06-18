@@ -5,23 +5,32 @@
 #include <QMessageBox>
 #include <QDateTime>
 #include <QPen>
+#include <QPainter>
 
 #define MAX_WIDTH 640
 #define MAX_HEIGHT 480
-#define CENTROID_SAMPLE_COUNT 60.f
+#define CENTROID_SAMPLE_COUNT 60
 #define OVERLAY_COLOR 0,0,200 // dead blue
 #define GRABCUT_COLOR 200,0,0 // dead red
 // tolerance, proportional to image hypotenuse, for grading
-#define TOLERANCE0 0.01
+/*#define TOLERANCE0 0.01
 #define TOLERANCE1 0.02
 #define TOLERANCE2 0.05
 #define TOLERANCE3 0.05
-#define TOLERANCE4 0.10
+#define TOLERANCE4 0.10*/
+
+#define TOLERANCE0 0.1
+#define TOLERANCE1 0.2
+#define TOLERANCE2 0.3
+#define TOLERANCE3 0.5
+#define TOLERANCE4 1.0
+
 #define SCORE0 100
 #define SCORE1 95
 #define SCORE2 90
 #define SCORE3 80
 #define SCORE4 75
+#define SCORE5 0
 
 ROTimage::ROTimage(QWidget *parent) : QLabel(parent)
 {
@@ -29,7 +38,7 @@ ROTimage::ROTimage(QWidget *parent) : QLabel(parent)
 
 int ROTimage::openFilename(){
     image= cv::imread(QFileDialog::getOpenFileName(this,tr("Open Image"), ".",
-                                                   tr("Image Files (*.JPEG; *.JPG; *.BMP; *.PNG)")).toStdString());
+    tr("Image Files (*.JPEG; *.JPG; *.BMP; *.PNG)")).toStdString());
    // QString fileName = QFileDialog::getOpenFileName();
     if(!image.data || image.cols>MAX_WIDTH || image.rows>MAX_HEIGHT) {
         qDebug("File not found or invalid.");
@@ -172,6 +181,14 @@ int ROTimage::checkRuleofThird(){
     }
     centroid_x = x_acc/ (double) CENTROID_SAMPLE_COUNT;
     centroid_y = y_acc/ (double) CENTROID_SAMPLE_COUNT;
+
+    /*QRectF rectangle (10,20,60,80);
+    QPainter painter(this);
+    painter.drawEllipse(rectangle);*/
+    //cv::circle( image, cv::Point( 100, 100 ), 10.0, cv::Scalar( 255, 0, 0 ), 4, 8 );
+    //cv::imshow("Image",image);
+
+
     qDebug("Centroid (x,y): %f %f",centroid_x,centroid_y);
     double hypotenuse = sqrt(pow(image.cols,2) + pow(image.rows,2));
     double distance;
@@ -179,34 +196,35 @@ int ROTimage::checkRuleofThird(){
         distance = sqrt(pow(centroid_x-intersect_x[i],2) \
                         + sqrt(pow(centroid_y-intersect_y[i],2)));
         if (distance < TOLERANCE0*hypotenuse){
-            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f, %.2f), distance %.2f px, score %d"\
+            messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f).\nDistance from nearest intersection is %.2f Pixel(s).\nScore %d."\
                                               ,centroid_x,centroid_y,distance,SCORE0));
             messagebox.exec();
             return(0);
         }
         if (distance < TOLERANCE1*hypotenuse){
-            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f, %.2f), distance %.2f px, score %d"\
+            messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f).\nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
                                               ,centroid_x,centroid_y,distance,SCORE1));
             messagebox.exec();
             return(0);
         }if (distance < TOLERANCE2*hypotenuse){
-            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f, %.2f), distance %.2f px, score %d"\
+            messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f).\nDistance from nearest intersection is %.2f Pixle(s).\nScore is %d."\
                                               ,centroid_x,centroid_y,distance,SCORE2));
             messagebox.exec();
             return(0);
         }if (distance < TOLERANCE3*hypotenuse){
-            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f, %.2f), distance %.2f px, score %d"\
+            messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f)\nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
                                               ,centroid_x,centroid_y,distance,SCORE3));
             messagebox.exec();
             return(0);
         }if (distance < TOLERANCE4*hypotenuse){
-            messagebox.setText(string.sprintf("Rule of Third: Yes, point (%.2f, %.2f), distance %.2f px, score %d"\
+            messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f).\nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
                                               ,centroid_x,centroid_y,distance,SCORE4));
             messagebox.exec();
             return(0);
         }
     }
-    messagebox.setText(string.sprintf("Rule of Third: No"));
+    messagebox.setText(string.sprintf("Rule of Thirds: No.\nCentroid is at coordinates (%.2f, %.2f).\nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
+                                      ,centroid_x,centroid_y,distance,SCORE5));
     messagebox.exec();
     return(1);
 }
