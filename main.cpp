@@ -61,5 +61,8 @@ int main(int argc, char *argv[])
     QObject::connect(button_file,SIGNAL(clicked()),tes,SLOT(openFilename()));
     QObject::connect(button_overlay,SIGNAL(clicked()),tes,SLOT(drawOverlay()));
     QObject::connect(button_rot,SIGNAL(clicked()),tes,SLOT(checkRuleofThird()));
+
+
+
     return a.exec();
 }

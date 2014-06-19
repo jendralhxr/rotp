@@ -12,22 +12,9 @@ LIBS += `pkg-config opencv --libs`
 }
 
 win32{
-INCLUDEPATH += C:\\opencv-2.4.9\\opencv\\build\\include
-LIBS += -LC:\\opencv-2.4.9\\mybuild\\lib\\Debug \
-            -lopencv_calib3d249d \
-            -lopencv_contrib249d \
-            -lopencv_core249d \
-            -lopencv_features2d249d \
-            -lopencv_flann249d \
-            -lopencv_gpu249d \
-            -lopencv_highgui249d \
-            -lopencv_imgproc249d \
-            -lopencv_legacy249d \
-            -lopencv_ml249d \
-            -lopencv_objdetect249d \
-            -lopencv_ts249d \
-            -lopencv_video249d
+INCLUDEPATH += C://opencv-2.4.5//mybuild//install//include
 
+LIBS += C://opencv-2.4.5//mybuild//bin//*.dll
 }
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

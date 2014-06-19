@@ -1,11 +1,14 @@
 #ifndef ROTIMAGE_H
 #define ROTIMAGE_H
 
+#include <QApplication>
 #include <QWidget>
 #include <QImage>
 #include <QPainter>
 #include <QPixmap>
 #include <QLabel>
+#include <QMessageBox>
+#include <QString>
 #include <opencv2/opencv.hpp>
 
 class ROTimage : public QLabel
@@ -50,6 +53,8 @@ private:
     double x_acc, y_acc;
     int x_temp, y_temp;
     int count;
+    QString string;
+    QMessageBox messagebox;
 
 };
 
