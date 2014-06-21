@@ -11,28 +11,35 @@
 
 #define MAX_WIDTH 640
 #define MAX_HEIGHT 480
-#define CENTROID_SAMPLE_COUNT 60
+#define CENTROID_SAMPLE_COUNT 60.f
 #define OVERLAY_COLOR 0,0,200 // dead blue
 #define GRABCUT_COLOR 200,0,0 // dead red
 // tolerance, proportional to image hypotenuse, for grading
-#define TOLERANCE0 0.01
+/*#define TOLERANCE0 0.01
 #define TOLERANCE1 0.02
 #define TOLERANCE2 0.05
 #define TOLERANCE3 0.05
-#define TOLERANCE4 0.10
+#define TOLERANCE4 0.10*/
 
-/*#define TOLERANCE0 0.1
-#define TOLERANCE1 0.2
-#define TOLERANCE2 0.3
-#define TOLERANCE3 0.5
-#define TOLERANCE4 1.0*/
+#define TOLERANCE0 0.01
+#define TOLERANCE1 0.02
+#define TOLERANCE2 0.04
+#define TOLERANCE3 0.06
+#define TOLERANCE4 0.07
+#define TOLERANCE5 0.08
+#define TOLERANCE6 0.09
+#define TOLERANCE7 0.1
+
 
 #define SCORE0 100
 #define SCORE1 95
 #define SCORE2 90
-#define SCORE3 80
-#define SCORE4 75
-#define SCORE5 0
+#define SCORE3 85
+#define SCORE4 80
+#define SCORE5 75
+#define SCORE6 60
+#define SCORE7 50
+#define SCORE8 0
 
 ROTimage::ROTimage(QWidget *parent) : QLabel(parent)
 {
@@ -40,14 +47,20 @@ ROTimage::ROTimage(QWidget *parent) : QLabel(parent)
 }
 
 int ROTimage::openFilename(){
+    //ROTimage::setGrabcut_Xbegin(0);
+    //ROTimage::setGrabcut_Ybegin(0);
     image= cv::imread(QFileDialog::getOpenFileName(this,tr("Open Image"), ".",
     tr("Image Files (*.JPEG; *.JPG; *.BMP; *.PNG)")).toStdString());
    // QString fileName = QFileDialog::getOpenFileName();
     if(!image.data || image.cols>MAX_WIDTH || image.rows>MAX_HEIGHT) {
-        qDebug("File not found or invalid.");
-        return(1);
+        messagebox.setText(string.sprintf("Image not found or image resolution is greater than 640x480 pixel"));
+        messagebox.exec();
+        return(0);
     }
     else{
+
+
+        //ROTimage::drawGrabcut(0);
         emit imageWidth(image.cols);
         emit imageHeight(image.rows);
         intersect_x[0] = image.cols/3;   intersect_y[0] = image.rows/3;
@@ -135,7 +148,7 @@ void ROTimage::drawOverlay(){
         pen.setColor(qRgb(OVERLAY_COLOR));
         pen.setWidth(2);
         painter.setPen(pen);
-
+    //painter.d
 
         painter.begin(&disp);
         painter.setPen(qRgb(OVERLAY_COLOR));
@@ -222,11 +235,29 @@ int ROTimage::checkRuleofThird(){
         centroid_x = x_acc/ (double) CENTROID_SAMPLE_COUNT;
         centroid_y = y_acc/ (double) CENTROID_SAMPLE_COUNT;
 
-        /*QRectF rectangle (10,20,60,80);
-        QPainter painter(this);
-        painter.drawEllipse(rectangle);*/
-        //cv::circle( image, cv::Point( 100, 100 ), 10.0, cv::Scalar( 255, 0, 0 ), 4, 8 );
-        //cv::imshow("Image",image);
+        painter.begin(&disp);
+        //painter.setPen(qRgb(OVERLAY_COLOR));
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        //painter.setPen(QPen(Qt::black, 3, Qt::DashDotLine, Qt::RoundCap));
+        painter.setBrush(QBrush(Qt::red, Qt::SolidPattern));
+        painter.drawEllipse(centroid_x,centroid_y,6,6);
+
+        painter.end();
+        setPixmap(QPixmap::fromImage(disp));
+        update();
+
+
+        //QRectF rectangle (centroid_x, centroid_y, centroid_x, centroid_y);
+        //QPainter painter(this);
+        //painter.drawEllipse(rectangle);
+        //image_centro;
+        //cv::cvtColor(image,image_centro,CV_GRAY2RGB);
+        //cv::circle(image_centro,cv::Point(centroid_x,centroid_y),2.0,cv::Scalar(255,0,0),2,8);
+        //cv::imshow("Image",image_centro);
+        //setPixmap(QPixmap::fromImage(image));
+        //renderImage();
+
+        //update();
 
 
         qDebug("Centroid (x,y): %f %f",centroid_x,centroid_y);
@@ -246,35 +277,57 @@ int ROTimage::checkRuleofThird(){
                                                   ,centroid_x,centroid_y,distance,SCORE1));
                 messagebox.exec();
                 return(0);
-            }if (distance < TOLERANCE2*hypotenuse){
+            }
+            if (distance < TOLERANCE2*hypotenuse){
                 messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f).\nDistance from nearest intersection is %.2f Pixle(s).\nScore is %d."\
                                                   ,centroid_x,centroid_y,distance,SCORE2));
                 messagebox.exec();
                 return(0);
-            }if (distance < TOLERANCE3*hypotenuse){
+            }
+            if (distance < TOLERANCE3*hypotenuse){
                 messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f)\nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
                                                   ,centroid_x,centroid_y,distance,SCORE3));
                 messagebox.exec();
                 return(0);
-            }if (distance < TOLERANCE4*hypotenuse){
+            }
+            if (distance < TOLERANCE4*hypotenuse){
                 messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f).\nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
                                                   ,centroid_x,centroid_y,distance,SCORE4));
                 messagebox.exec();
                 return(0);
             }
+            if (distance < TOLERANCE5*hypotenuse){
+                messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f).\nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
+                                                  ,centroid_x,centroid_y,distance,SCORE5));
+                messagebox.exec();
+                return(0);
+            }
+            if (distance < TOLERANCE6*hypotenuse){
+                messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f).\nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
+                                                  ,centroid_x,centroid_y,distance,SCORE6));
+                messagebox.exec();
+                return(0);
+            }
+            if (distance < TOLERANCE7*hypotenuse){
+                messagebox.setText(string.sprintf("Rule of Thirds: No.\nCentroid is at coordinates (%.2f, %.2f).\nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
+                                                  ,centroid_x,centroid_y,distance,SCORE8));
+                messagebox.exec();
+                return(0);
+            }
         }
+
         messagebox.setText(string.sprintf("Rule of Thirds: No.\nCentroid is at coordinates (%.2f, %.2f).\nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-                                          ,centroid_x,centroid_y,distance,SCORE5));
-        messagebox.exec();
-        return(1);
+                                                  ,centroid_x,centroid_y,distance,SCORE8));
+                messagebox.exec();
+                return(0);
     }
 
-    catch(int x_temp)
+    catch(...)
     {
         messagebox.setText(string.sprintf("Open an image first before use yyyy \
 segmentation"));
         messagebox.exec();
-        return(0);
+        return(1);
     }
 }
 
@@ -284,4 +337,9 @@ int ROTimage::getHeight(){
 
 int ROTimage::getWidth(){
     return(image.cols);
+}
+
+void ROTimage::exit()
+{
+    //exit(EXIT_FAILURE);
 }

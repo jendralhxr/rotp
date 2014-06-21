@@ -35,6 +35,7 @@ public slots:
     void setGrabcut_Xend(int pixel);
     void setGrabcut_Yend(int pixel);
     int checkRuleofThird();
+    void exit();
 
 private:
     // for grabcut
@@ -55,6 +56,7 @@ private:
     int count;
     QString string;
     QMessageBox messagebox;
+    cv::Mat image_centro;
 
 };
 
