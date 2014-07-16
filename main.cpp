@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     QPushButton *button_otsu = new QPushButton("Apply Grayscale and Otsu Threshold");
     QPushButton *button_overlay = new QPushButton("Draw Rule of Thirds Overlay");
     QPushButton *button_rot = new QPushButton("Rule of Thirds Check");
-    QPushButton *button_exit = new QPushButton("Exit");
+    //QPushButton *button_exit = new QPushButton("Exit");
 
     QGridLayout *layout = new QGridLayout();
     layout->addWidget(button_file,0,0,1,2,Qt::AlignLeft);
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     layout->addWidget(button_otsu,6,0,1,2,Qt::AlignLeft);
     layout->addWidget(button_overlay,7,0,1,2,Qt::AlignLeft);
     layout->addWidget(button_rot,8,0,2,1,Qt::AlignLeft);
-    layout->addWidget(button_exit,9,0,15,2,Qt::AlignLeft);
+    //layout->addWidget(button_exit,9,0,15,2,Qt::AlignLeft);
     //layout->addWidget();
     layout->addWidget(tes,0,3,10,1,Qt::AlignLeft);
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     QObject::connect(button_file,SIGNAL(clicked()),tes,SLOT(openFilename()));
     QObject::connect(button_overlay,SIGNAL(clicked()),tes,SLOT(drawOverlay()));
     QObject::connect(button_rot,SIGNAL(clicked()),tes,SLOT(checkRuleofThird()));
-    QObject::connect(button_exit,SIGNAL(clicked()),tes,SLOT(exit()));
+    //QObject::connect(button_exit,SIGNAL(clicked()),tes,SLOT(exit()));
 
 
 

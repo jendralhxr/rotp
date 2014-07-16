@@ -11,6 +11,8 @@
 #include <QString>
 #include <opencv2/opencv.hpp>
 
+using namespace cv;
+
 class ROTimage : public QLabel
 {
     Q_OBJECT
@@ -35,29 +37,27 @@ public slots:
     void setGrabcut_Xend(int pixel);
     void setGrabcut_Yend(int pixel);
     int checkRuleofThird();
-    void exit();
+    //void exit();
 
 private:
     // for grabcut
-    cv::Mat result; // segmentation result (4 possible values)
-    cv::Mat bgModel,fgModel; // the models (internally used)
+    Mat result; // segmentation result (4 possible values)
+    Mat bgModel,fgModel; // the models (internally used)
     int grabcut_xbegin, grabcut_ybegin, grabcut_xend, grabcut_yend;
-    cv::Rect grabcut_rect;
+    Rect grabcut_rect;
 
     // centroid variables
     double intersect_x[4], intersect_y[4];
     double centroid_x, centroid_y;
-    // cv::Mat -> QImage -> QLabel render
-    cv::Mat image, tmp;
+    // Mat -> QImage -> QLabel render
+    Mat image, tmp, image_centro;
     QImage disp;
     QPainter painter;
-    double x_acc, y_acc;
+    double x_accumulative, y_accumulative;
     int x_temp, y_temp;
     int count;
     QString string;
     QMessageBox messagebox;
-    cv::Mat image_centro;
-
 };
 
 #endif // ROTIMAGE_H
