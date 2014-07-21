@@ -40,6 +40,10 @@ public slots:
     //void exit();
 
 private:
+    //for tolerance and scoring
+    double toleransi[8] = {0.001, 0.004, 0.008, 0.020, 0.040, 0.060, 0.080, 0.100};
+    int skor[9] = {100,95,90,85,80,75,60,50,0};
+
     // for grabcut
     Mat result; // segmentation result (4 possible values)
     Mat bgModel,fgModel; // the models (internally used)

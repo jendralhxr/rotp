@@ -96,7 +96,8 @@ int ROTimage::openFilename(){
    image = imread(QFileDialog::getOpenFileName(this,tr("Open Image"), "./images",
     tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
     if(!image.data || image.cols>MAX_WIDTH || image.rows>MAX_HEIGHT) {
-        messagebox.setText(string.sprintf("Image not found or image resolution is greater than 640x480 or 480x640 pixels"));
+        messagebox.setText(string.sprintf("Image not found or image resolution is \
+                                          greater than 640x480 or 480x640 pixels"));
         messagebox.exec();
         return(0);
     }
@@ -258,6 +259,9 @@ void ROTimage::setGrabcut_Yend(int pixel){
 }
 
 int ROTimage::checkRuleofThird(){
+//    toleransi[];
+//    skor[];
+
     try
     {
         while(count<CENTROID_SAMPLE_COUNT){
@@ -286,169 +290,29 @@ int ROTimage::checkRuleofThird(){
         double hypotenuse = sqrt(pow(image.cols,2) + pow(image.rows,2));
         double distance;
         for (int i=0; i<4; i++){
-            distance = sqrt(pow(centroid_x-intersect_x[i],2) \
-                            + sqrt(pow(centroid_y-intersect_y[i],2)));
-            if (distance < TOLERANCE0*hypotenuse){
-                messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-                                                  \nDistance from nearest intersection is %.2f Pixel(s).\nScore %d."\
-                                                  ,centroid_x,centroid_y,distance,SCORE0));
-                messagebox.exec();
-                return(0);
+            for (int j=0; j<8; j++){
+                for (int k=0; k<9; k++){
+                 distance = sqrt(pow(centroid_x-intersect_x[i],2) \
+                                        + sqrt(pow(centroid_y-intersect_y[i],2)));
+                        if (distance < toleransi[j]*hypotenuse){
+                            messagebox.setText(string.sprintf("Rule of Thirds: Yes. \
+                                                              \nCentroid is at coordinates (%.2f, %.2f). \
+                                                              \nDistance from nearest \
+                                                              intersection is %.2f Pixel(s).\nScore %d."\
+                                                              ,centroid_x,centroid_y,distance,skor[k]));
+                            messagebox.exec();
+                            return(0);
+                      }
+                 }
             }
-            if (distance < TOLERANCE1*hypotenuse){
-                messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
+        }
+
+                messagebox.setText(string.sprintf("Rule of Thirds: No.\nCentroid is at coordinates (%.2f, %.2f). \
                                                   \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-                                                  ,centroid_x,centroid_y,distance,SCORE1));
-                messagebox.exec();
-                return(0);
-            }
-            if (distance < TOLERANCE2*hypotenuse){
-                messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-                                                  \nDistance from nearest intersection is %.2f Pixle(s).\nScore is %d."\
-                                                  ,centroid_x,centroid_y,distance,SCORE2));
-                messagebox.exec();
-
-                return(0);
-            }
-            if (distance < TOLERANCE3*hypotenuse){
-                messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-                                                  \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-                                                  ,centroid_x,centroid_y,distance,SCORE3));
-                messagebox.exec();
-                return(0);
-            }
-            if (distance < TOLERANCE4*hypotenuse){
-                messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-                                                  \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-                                                  ,centroid_x,centroid_y,distance,SCORE4));
-                messagebox.exec();
-                return(0);
-            }
-            if (distance < TOLERANCE5*hypotenuse){
-                messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-                                                  \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-                                                  ,centroid_x,centroid_y,distance,SCORE5));
-                messagebox.exec();
-                return(0);
-            }
-            if (distance < TOLERANCE6*hypotenuse){
-                messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-                                                  \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-                                                  ,centroid_x,centroid_y,distance,SCORE6));
-                messagebox.exec();
-                return(0);
-            }
-            if (distance < TOLERANCE7*hypotenuse){
-                messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-                                                  \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-                                                  ,centroid_x,centroid_y,distance,SCORE7));
-                messagebox.exec();
-                return(0);
-            }
-}
-//    if (distance < TOLERANCE8*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE8));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//    if (distance < TOLERANCE9*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE9));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//    if (distance < TOLERANCE10*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE10));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//    if (distance < TOLERANCE11*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE11));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//    if (distance < TOLERANCE12*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE12));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//    if (distance < TOLERANCE13*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE13));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//    if (distance < TOLERANCE14*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE14));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//    if (distance < TOLERANCE15*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE15));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//    if (distance < TOLERANCE16*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE16));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//    if (distance < TOLERANCE17*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE17));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//    if (distance < TOLERANCE18*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE18));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//    if (distance < TOLERANCE19*hypotenuse){
-//        messagebox.setText(string.sprintf("Rule of Thirds: Yes.\nCentroid is at coordinates (%.2f, %.2f). \
-//                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-//                                          ,centroid_x,centroid_y,distance,SCORE19));
-//        messagebox.exec();
-//        return(0);
-//    }
-
-//}
-        messagebox.setText(string.sprintf("Rule of Thirds: No.\nCentroid is at coordinates (%.2f, %.2f). \
-                                          \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
-                                          ,centroid_x,centroid_y,distance,SCORE8));
-                messagebox.exec();
-                return(0);
-}
+                                                  ,centroid_x,centroid_y,distance,skor[8]));
+                        messagebox.exec();
+                        return(0);
+        }
 
 
     catch(...)
