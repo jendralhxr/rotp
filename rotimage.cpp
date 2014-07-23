@@ -26,9 +26,8 @@ ROTimage::ROTimage(QWidget *parent) : QLabel(parent)
 int ROTimage::openFilename(){
     image.release();
     tmp.release();
-    //    image = imread(QFileDialog::getOpenFileName(this,tr("Open Image"), "./images",
-    //                                                tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
-    image = imread(QFileDialog::getOpenFileName().toStdString());
+        image = imread(QFileDialog::getOpenFileName(this,tr("Open Image"), "./images",
+                                                    tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
 
     if(!image.data || image.cols>MAX_WIDTH || image.rows>MAX_HEIGHT) {
         messagebox.setText(string.sprintf("Image not found or image dimension is \
