@@ -109,6 +109,49 @@ void ROTimage::applyGrayOtsu(){
         cvtColor(foreground,img_gray,CV_RGB2GRAY);
         threshold(img_gray,img_bw,0,255,CV_THRESH_BINARY|CV_THRESH_OTSU);
         image = img_bw;
+
+//        vector<vector<Point> > contours;
+//        vector<Vec4i> hierarchy;
+//        findContours(img_bw,contours,hierarchy,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_NONE,Point(0,0));
+//        vector<vector<Point> > hull(contours.size());
+//        for(int v=0; v<contours.size(); v++){
+//            convexHull(Mat(contours[v]),hull[v],false);
+//        }
+//        RNG rng;
+//        Mat drawing = Mat::zeros(img_bw.size(),CV_8UC3);
+//        for(int v=0; v<contours.size(); v++){
+//            Scalar color = Scalar(rng.uniform(255,255),rng.uniform(255,255),rng.uniform(255,255));
+//            drawContours(drawing,contours,v,color,1,8,vector<Vec4i>(),255,Point());
+//            drawContours(drawing,hull,v,color,1,8,vector<Vec4i>(),255,Point());
+//        }
+//        image = drawing;
+
+//         Mat img_gray;
+//         cvtColor(image,img_gray,CV_RGB2GRAY);
+//         Mat src_copy = image.clone();
+//         Mat threshold_output;
+//         vector<vector<Point> > contours;
+//         vector<Vec4i> hierarchy;
+
+//         // Find contours
+//         threshold( img_gray, threshold_output, 0, 255, THRESH_BINARY|THRESH_OTSU );
+//         findContours( threshold_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+//         // Find the convex hull object for each contour
+//         vector<vector<Point> >hull( contours.size() );
+//         for( int i = 0; i < contours.size(); i++ )
+//         {  convexHull( Mat(contours[i]), hull[i], false ); }
+
+//         // Draw contours + hull results
+//         RNG rng;
+//         Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
+//         for( int i = 0; i< contours.size(); i++ )
+//         {
+//          Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+//          drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+//          drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+//         }
+//         image = drawing;
         renderImage();
     }
 
@@ -193,6 +236,8 @@ int ROTimage::checkRuleofThird(){
     //    toleransi[];
     //    skor[];
 
+populate = (grabcut_xend-grabcut_xbegin)*(grabcut_yend-grabcut_ybegin);
+
     try
     {
         while(count<CENTROID_SAMPLE_COUNT){
@@ -208,6 +253,8 @@ int ROTimage::checkRuleofThird(){
         }
         centroid_x = x_accumulative/ (double) CENTROID_SAMPLE_COUNT;
         centroid_y = y_accumulative/ (double) CENTROID_SAMPLE_COUNT;
+//        centroid_x = x_accumulative/ (double) populate;
+//        centroid_y = y_accumulative/ (double) populate;
 
         painter.begin(&disp);
         painter.setRenderHint(QPainter::Antialiasing, true);
@@ -229,8 +276,8 @@ int ROTimage::checkRuleofThird(){
                 if (distance < tolerance[j]*hypotenuse){
                     messagebox.setText(string.sprintf("Rule of Thirds: Yes (Intersection Rule). \
                                                       \nCentroid is at coordinates (%.2f, %.2f). Sample count: %d/%d\
-                                                      \nDistance from nearest intersection is %.2f Pixel(s). Score %d.",
-                                                      centroid_x, centroid_y, count,population, distance, score[j]));
+                                                      \nDistance from nearest intersection is %.2f Pixel(s). Score %d. Populate is %d",
+                                                      centroid_x, centroid_y, count,population, distance, score[j], populate));
                     messagebox.exec();
                     return(0);
                 }
@@ -257,8 +304,8 @@ int ROTimage::checkRuleofThird(){
                 if (distance < tolerance[j]*hypotenuse){
                     messagebox.setText(string.sprintf("Rule of Thirds: Yes (Line Rule). \
                                                       \nCentroid is at coordinates (%.2f, %.2f). Sample count: %d/%d\
-                                                      \nDistance from nearest line is %.2f Pixel(s). Score %d.",
-                                                      centroid_x, centroid_y, count, population, distance, score[j]-LINE_SCORE_GRADE));
+                                                      \nDistance from nearest line is %.2f Pixel(s). Score %d. Populate is %d",
+                                                      centroid_x, centroid_y, count, population, distance, score[j]-LINE_SCORE_GRADE, populate));
                     messagebox.exec();
                     return(0);
                 }

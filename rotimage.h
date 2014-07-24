@@ -60,6 +60,7 @@ private:
     double x_accumulative, y_accumulative;
     int x_temp, y_temp;
     int count, population;
+    int populate;
     QString string;
     QMessageBox messagebox;
 };
