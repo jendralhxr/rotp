@@ -79,10 +79,10 @@ void ROTimage::applyGrabcut(){
                 result,   // segmentation result
                 grabcut_rect,// rectangle containing foreground
                 bgModel,fgModel, // models
-                1,        // number of iterations
+                1, // number of iterations
                 GC_INIT_WITH_RECT); // use rectangle
         // Get the pixels marked as likely foreground
-        compare(result,GC_PR_FGD,result,CMP_EQ);
+        compare(result, GC_PR_FGD,result,CMP_EQ);
         // Generate output image
         Mat foreground(image.size(),CV_8UC3,Scalar(0,0,0));
         image.copyTo(foreground,result); // bg pixels not copied
@@ -109,49 +109,6 @@ void ROTimage::applyGrayOtsu(){
         cvtColor(foreground,img_gray,CV_RGB2GRAY);
         threshold(img_gray,img_bw,0,255,CV_THRESH_BINARY|CV_THRESH_OTSU);
         image = img_bw;
-
-//        vector<vector<Point> > contours;
-//        vector<Vec4i> hierarchy;
-//        findContours(img_bw,contours,hierarchy,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_NONE,Point(0,0));
-//        vector<vector<Point> > hull(contours.size());
-//        for(int v=0; v<contours.size(); v++){
-//            convexHull(Mat(contours[v]),hull[v],false);
-//        }
-//        RNG rng;
-//        Mat drawing = Mat::zeros(img_bw.size(),CV_8UC3);
-//        for(int v=0; v<contours.size(); v++){
-//            Scalar color = Scalar(rng.uniform(255,255),rng.uniform(255,255),rng.uniform(255,255));
-//            drawContours(drawing,contours,v,color,1,8,vector<Vec4i>(),255,Point());
-//            drawContours(drawing,hull,v,color,1,8,vector<Vec4i>(),255,Point());
-//        }
-//        image = drawing;
-
-//         Mat img_gray;
-//         cvtColor(image,img_gray,CV_RGB2GRAY);
-//         Mat src_copy = image.clone();
-//         Mat threshold_output;
-//         vector<vector<Point> > contours;
-//         vector<Vec4i> hierarchy;
-
-//         // Find contours
-//         threshold( img_gray, threshold_output, 0, 255, THRESH_BINARY|THRESH_OTSU );
-//         findContours( threshold_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
-
-//         // Find the convex hull object for each contour
-//         vector<vector<Point> >hull( contours.size() );
-//         for( int i = 0; i < contours.size(); i++ )
-//         {  convexHull( Mat(contours[i]), hull[i], false ); }
-
-//         // Draw contours + hull results
-//         RNG rng;
-//         Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
-//         for( int i = 0; i< contours.size(); i++ )
-//         {
-//          Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-//          drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
-//          drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
-//         }
-//         image = drawing;
         renderImage();
     }
 
@@ -160,7 +117,7 @@ void ROTimage::applyGrayOtsu(){
         messagebox.setText(string.sprintf("Open an image first or apply the grabcut \
                                           segmentation first"));
                                           messagebox.exec();
-                           return;
+                   return;
     }
 }
 
@@ -172,10 +129,10 @@ void ROTimage::drawOverlay(){
         pen.setWidth(2);
         pen.setColor(qRgb(OVERLAY_COLOR));
         painter.setPen(pen);
-        painter.drawLine(0, image.rows/3,   image.cols, image.rows/3);
-        painter.drawLine(0, 2*image.rows/3, image.cols, 2*image.rows/3);
-        painter.drawLine(image.cols/3,      0,  image.cols/3,   image.rows);
-        painter.drawLine(2*image.cols/3,    0,  2*image.cols/3, image.rows);
+        painter.drawLine(0, image.rows/3,   image.cols, image.rows/3); //draw upper horizontal third line
+        painter.drawLine(0, 2*image.rows/3, image.cols, 2*image.rows/3); //draw lower horizontal third line
+        painter.drawLine(image.cols/3,      0,  image.cols/3,   image.rows); //draw left vertical third line
+        painter.drawLine(2*image.cols/3,    0,  2*image.cols/3, image.rows); //draw right vertical third line
         painter.end();
         setPixmap(QPixmap::fromImage(disp));
         update();
@@ -196,13 +153,13 @@ void ROTimage::drawGrabcut(){
     QPen pen;
     painter.begin(&disp);
     pen.setColor(qRgb(GRABCUT_COLOR));
-    pen.setWidth(2);
+    pen.setWidth(4);
     painter.setPen(pen);
 
-    painter.drawLine(grabcut_xbegin, grabcut_ybegin, grabcut_xbegin, grabcut_yend);
-    painter.drawLine(grabcut_xend  , grabcut_ybegin, grabcut_xend  , grabcut_yend);
-    painter.drawLine(grabcut_xbegin, grabcut_ybegin, grabcut_xend  , grabcut_ybegin);
-    painter.drawLine(grabcut_xbegin, grabcut_yend  , grabcut_xend  , grabcut_yend);
+    painter.drawLine(grabcut_xbegin, grabcut_ybegin, grabcut_xbegin, grabcut_yend); //draw left vertical line
+    painter.drawLine(grabcut_xend  , grabcut_ybegin, grabcut_xend  , grabcut_yend); //draw right vertical line
+    painter.drawLine(grabcut_xbegin, grabcut_ybegin, grabcut_xend  , grabcut_ybegin); //draw upper horizontal line
+    painter.drawLine(grabcut_xbegin, grabcut_yend  , grabcut_xend  , grabcut_yend); //drraw lower horizontal line
     painter.end();
     setPixmap(QPixmap::fromImage(disp));
     update();
@@ -233,17 +190,13 @@ void ROTimage::setGrabcut_Yend(int pixel){
 }
 
 int ROTimage::checkRuleofThird(){
-    //    toleransi[];
-    //    skor[];
-
-populate = (grabcut_xend-grabcut_xbegin)*(grabcut_yend-grabcut_ybegin);
 
     try
     {
         while(count<CENTROID_SAMPLE_COUNT){
             population++;
-            x_temp = rand()%image.cols;
-            y_temp = rand()%image.rows;
+            x_temp = grabcut_xbegin + rand()%(grabcut_xend-grabcut_xbegin);
+            y_temp = grabcut_ybegin + rand()%(grabcut_yend-grabcut_ybegin);
             Scalar color = image.at<uchar>(y_temp, x_temp);
             if (color.val[0]==255){ // the pixel[temp] is white!!
                 x_accumulative = x_accumulative + double(x_temp);
@@ -253,13 +206,11 @@ populate = (grabcut_xend-grabcut_xbegin)*(grabcut_yend-grabcut_ybegin);
         }
         centroid_x = x_accumulative/ (double) CENTROID_SAMPLE_COUNT;
         centroid_y = y_accumulative/ (double) CENTROID_SAMPLE_COUNT;
-//        centroid_x = x_accumulative/ (double) populate;
-//        centroid_y = y_accumulative/ (double) populate;
 
         painter.begin(&disp);
         painter.setRenderHint(QPainter::Antialiasing, true);
         painter.setBrush(QBrush(Qt::red, Qt::SolidPattern));
-        painter.drawEllipse(centroid_x,centroid_y,6,6);
+        painter.drawEllipse(centroid_x,centroid_y,10,10);
 
         painter.end();
         setPixmap(QPixmap::fromImage(disp));
@@ -274,44 +225,15 @@ populate = (grabcut_xend-grabcut_xbegin)*(grabcut_yend-grabcut_ybegin);
             for (int j=0; j<8; j++){
                 distance = sqrt(pow(centroid_x-intersect_x[i],2)+pow(centroid_y-intersect_y[i],2));
                 if (distance < tolerance[j]*hypotenuse){
-                    messagebox.setText(string.sprintf("Rule of Thirds: Yes (Intersection Rule). \
+                    messagebox.setText(string.sprintf("Rule of Thirds: Yes. \
                                                       \nCentroid is at coordinates (%.2f, %.2f). Sample count: %d/%d\
-                                                      \nDistance from nearest intersection is %.2f Pixel(s). Score %d. Populate is %d",
-                                                      centroid_x, centroid_y, count,population, distance, score[j], populate));
+                                                      \nDistance from nearest intersection is %.2f Pixel(s). Score %d.",
+                                                      centroid_x, centroid_y, count,population, distance, score[j]));
                     messagebox.exec();
                     return(0);
                 }
             }
         }
-
-        // rule of thirds check, line rule
-        for (int i=0; i<4; i++){
-            switch (i) {
-            case 1:
-                distance = centroid_x-image.cols/3;
-                break;
-            case 2:
-                distance = centroid_x-2*image.cols/3;
-                break;
-            case 3:
-                distance = centroid_y-image.rows/3;
-                break;
-            case 4:
-                distance = centroid_y-2*image.rows/3;
-                break;
-            }
-            for (int j=0; j<8; j++){
-                if (distance < tolerance[j]*hypotenuse){
-                    messagebox.setText(string.sprintf("Rule of Thirds: Yes (Line Rule). \
-                                                      \nCentroid is at coordinates (%.2f, %.2f). Sample count: %d/%d\
-                                                      \nDistance from nearest line is %.2f Pixel(s). Score %d. Populate is %d",
-                                                      centroid_x, centroid_y, count, population, distance, score[j]-LINE_SCORE_GRADE, populate));
-                    messagebox.exec();
-                    return(0);
-                }
-            }
-        }
-
 
         messagebox.setText(string.sprintf("Rule of Thirds: No.\nCentroid is at coordinates (%.2f, %.2f). \
                                           \nDistance from nearest intersection is %.2f Pixel(s).\nScore is %d."\
