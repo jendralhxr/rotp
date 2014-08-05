@@ -26,8 +26,9 @@ ROTimage::ROTimage(QWidget *parent) : QLabel(parent)
 int ROTimage::openFilename(){
     image.release();
     tmp.release();
-        image = imread(QFileDialog::getOpenFileName(this,tr("Open Image"), "./images",
-                                                    tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
+ //   image = imread(QFileDialog::getOpenFileName(this,tr("Open Image"), "./images",
+  //                                              tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
+    image = imread(QFileDialog::getOpenFileName().toStdString());
 
     if(!image.data || image.cols>MAX_WIDTH || image.rows>MAX_HEIGHT) {
         messagebox.setText(string.sprintf("Image not found or image dimension is \
@@ -117,7 +118,7 @@ void ROTimage::applyGrayOtsu(){
         messagebox.setText(string.sprintf("Open an image first or apply the grabcut \
                                           segmentation first"));
                                           messagebox.exec();
-                   return;
+                           return;
     }
 }
 
@@ -229,6 +230,34 @@ int ROTimage::checkRuleofThird(){
                                                       \nCentroid is at coordinates (%.2f, %.2f). Sample count: %d/%d\
                                                       \nDistance from nearest intersection is %.2f Pixel(s). Score %d.",
                                                       centroid_x, centroid_y, count,population, distance, score[j]));
+                    messagebox.exec();
+                    return(0);
+                }
+            }
+        }
+
+        // rule of thirds check, line rule
+        for (int i=0; i<4; i++){
+            switch (i) {
+            case 1:
+                distance = abs(centroid_x-image.cols/3);
+                break;
+            case 2:
+                distance = abs(centroid_x-2*image.cols/3);
+                break;
+            case 3:
+                distance = abs(centroid_y-image.rows/3);
+                break;
+            case 4:
+                distance = abs(centroid_y-2*image.rows/3);
+                break;
+            }
+            for (int j=0; j<8; j++){
+                if (distance < tolerance[j]*hypotenuse){
+                    messagebox.setText(string.sprintf("Rule of Thirds: Yes (Line Rule). \
+                                                      \nCentroid is at coordinates (%.2f, %.2f). Sample count: %d/%d\
+                                                      \nDistance from nearest line is %.2f Pixel(s). Score %d.",
+                                                      centroid_x, centroid_y, count, population, distance, score[j]+LINE_SCORE_GRADE));
                     messagebox.exec();
                     return(0);
                 }
