@@ -26,9 +26,17 @@ ROTimage::ROTimage(QWidget *parent) : QLabel(parent)
 int ROTimage::openFilename(){
     image.release();
     tmp.release();
+<<<<<<< HEAD
+    grabcut_xbegin = 0;
+    grabcut_ybegin = 0;
+
+    image = imread(QFileDialog::getOpenFileName(this,tr("Open Image"), "./images",
+                                                    tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
+=======
  //   image = imread(QFileDialog::getOpenFileName(this,tr("Open Image"), "./images",
   //                                              tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
     image = imread(QFileDialog::getOpenFileName().toStdString());
+>>>>>>> origin/master
 
     if(!image.data || image.cols>MAX_WIDTH || image.rows>MAX_HEIGHT) {
         messagebox.setText(string.sprintf("Image not found or image dimension is \
@@ -191,10 +199,18 @@ void ROTimage::setGrabcut_Yend(int pixel){
 }
 
 int ROTimage::checkRuleofThird(){
+    grab_populate = (grabcut_xend-grabcut_xbegin)*(grabcut_yend-grabcut_ybegin);
+    whole_populate = image.cols*image.rows;
+    proportion = grab_populate/whole_populate;
+    q = 1 - proportion;
+    trust = 1.96;
+    tpq = (pow(trust,2))*proportion*q;
+    deviation = pow(0.05,2);
+    min_sample = (q/deviation)/(1+(1/whole_populate)*((q/deviation)-1));
 
     try
     {
-        while(count<CENTROID_SAMPLE_COUNT){
+        while(count<min_sample){
             population++;
             x_temp = grabcut_xbegin + rand()%(grabcut_xend-grabcut_xbegin);
             y_temp = grabcut_ybegin + rand()%(grabcut_yend-grabcut_ybegin);
@@ -205,14 +221,13 @@ int ROTimage::checkRuleofThird(){
                 count++;
             }
         }
-        centroid_x = x_accumulative/ (double) CENTROID_SAMPLE_COUNT;
-        centroid_y = y_accumulative/ (double) CENTROID_SAMPLE_COUNT;
+        centroid_x = x_accumulative/ (double) min_sample;
+        centroid_y = y_accumulative/ (double) min_sample;
 
         painter.begin(&disp);
         painter.setRenderHint(QPainter::Antialiasing, true);
         painter.setBrush(QBrush(Qt::red, Qt::SolidPattern));
         painter.drawEllipse(centroid_x,centroid_y,10,10);
-
         painter.end();
         setPixmap(QPixmap::fromImage(disp));
         update();
@@ -223,13 +238,49 @@ int ROTimage::checkRuleofThird(){
 
         // rule of thirds check, intersection rule
         for (int i=0; i<4; i++){
+
+            Scalar color = image.at<uchar>(intersect_x[i], intersect_y[i]);
+            if (color.val[0]==255){ // the pixel[temp] is white!!
+                painter.begin(&disp);
+                painter.setRenderHint(QPainter::Antialiasing, true);
+                painter.setBrush(QBrush(Qt::yellow, Qt::SolidPattern));
+                painter.drawEllipse(intersect_x[i],intersect_y[i],10,10);
+                painter.end();
+                setPixmap(QPixmap::fromImage(disp));
+                update();
+                qDebug("Rule Of Thirds: Yes. Pass thru at (%.2f, %.2f)",intersect_x[i],intersect_y[i]);
+//                    messagebox.setText(string.sprintf("Yes. At (%.2f, %.2f)",intersect_x[i],intersect_y[i]));
+//                    messagebox.exec();
+//                    return(0);
+                //qDebug("width is %d & height is %d",image.cols,image.rows);
+                qDebug("populate is %d and minimum sample is %f",grab_populate,min_sample);
+            }
+
             for (int j=0; j<8; j++){
                 distance = sqrt(pow(centroid_x-intersect_x[i],2)+pow(centroid_y-intersect_y[i],2));
+
+                QPen pen;
+                painter.begin(&disp);
+                pen.setWidth(2);
+                pen.setStyle(Qt::DashLine);
+                pen.setColor(qRgb(0,255,0));
+                painter.setPen(pen);
+                painter.drawLine(centroid_x, centroid_y, intersect_x[i],intersect_y[i]); //draw dashed line from centroid to all intersection
+                painter.end();
+                setPixmap(QPixmap::fromImage(disp));
+                update();
+
+
+
                 if (distance < tolerance[j]*hypotenuse){
                     messagebox.setText(string.sprintf("Rule of Thirds: Yes. \
-                                                      \nCentroid is at coordinates (%.2f, %.2f). Sample count: %d/%d\
-                                                      \nDistance from nearest intersection is %.2f Pixel(s). Score %d.",
-                                                      centroid_x, centroid_y, count,population, distance, score[j]));
+                                                      \nCentroid is at coordinates (%.2f, %.2f). \
+                                                      \nPopulation in grabcut area is %d. \
+                                                      \nNumber of sample is %d. \
+                                                      \nDistance from nearest intersection is %.2f Pixel(s). \
+                                                      \nScore %d.",
+                                                      centroid_x, centroid_y,grab_populate, (int)min_sample, distance, score[j]));
+//                                                      centroid_x, centroid_y, count,population, distance, score[j]));
                     messagebox.exec();
                     return(0);
                 }
@@ -280,9 +331,6 @@ int ROTimage::checkRuleofThird(){
 
 }
 
-
-
-
 int ROTimage::getHeight(){
     return(image.rows);
 }
@@ -290,8 +338,3 @@ int ROTimage::getHeight(){
 int ROTimage::getWidth(){
     return(image.cols);
 }
-
-//void ROTimage::exit()
-//{
-//    //exit(EXIT_FAILURE);
-//}

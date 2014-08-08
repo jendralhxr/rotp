@@ -41,7 +41,7 @@ public slots:
 
 private:
     //for tolerance and scoring
-    double tolerance[8] = {0.001, 0.004, 0.008, 0.020, 0.040, 0.060, 0.080, 0.100};
+    double tolerance[8] = {0.001, 0.008, 0.020, 0.030, 0.045, 0.060, 0.090, 0.100};
     int score[9] = {100, 95, 90, 85, 80, 75, 60, 50, 0};
 
     // for grabcut
@@ -60,9 +60,13 @@ private:
     double x_accumulative, y_accumulative;
     int x_temp, y_temp;
     int count, population;
-    int populate;
+    //int populate;
     QString string;
     QMessageBox messagebox;
+
+    //for sampling
+    double proportion,min_sample,trust,deviation,q,tpq;
+    int grab_populate,whole_populate;
 };
 
 #endif // ROTIMAGE_H
