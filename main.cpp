@@ -12,7 +12,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    ROTimage *tes = new ROTimage();
+    ROTimage *rule = new ROTimage();
 //    tes->openFilename();
 
     ROTSpinBox *spinbox_Xstart = new ROTSpinBox();
@@ -27,7 +27,6 @@ int main(int argc, char *argv[])
     QPushButton *button_otsu = new QPushButton("Apply Grayscale and Otsu Threshold");
     QPushButton *button_overlay = new QPushButton("Draw Rule of Thirds Overlay");
     QPushButton *button_rot = new QPushButton("Rule of Thirds Check");
-    //QPushButton *button_exit = new QPushButton("Exit");
 
     QGridLayout *layout = new QGridLayout();
     layout->addWidget(button_file,0,0,1,2,Qt::AlignLeft);
@@ -41,32 +40,27 @@ int main(int argc, char *argv[])
     layout->addWidget(button_otsu,6,0,1,2,Qt::AlignLeft);
     layout->addWidget(button_overlay,7,0,1,2,Qt::AlignLeft);
     layout->addWidget(button_rot,8,0,2,1,Qt::AlignLeft);
-    //layout->addWidget(button_exit,9,0,15,2,Qt::AlignLeft);
-    //layout->addWidget();
-    layout->addWidget(tes,0,3,10,1,Qt::AlignLeft);
+    layout->addWidget(rule,0,3,10,1,Qt::AlignLeft);
 
     QWidget *display = new QWidget();
     display->setLayout(layout);
     display->show();
 
-    QObject::connect(tes,SIGNAL(imageWidth(int)),spinbox_Xstart,SLOT(setValueMax(int)));
-    QObject::connect(tes,SIGNAL(imageWidth(int)),spinbox_Xend,SLOT(setValueMax(int)));
-    QObject::connect(tes,SIGNAL(imageHeight(int)),spinbox_Ystart,SLOT(setValueMax(int)));
-    QObject::connect(tes,SIGNAL(imageHeight(int)),spinbox_Yend,SLOT(setValueMax(int)));
-    QObject::connect(tes,SIGNAL(imageWidth(int)),spinbox_Xend,SLOT(setValue(int)));
-    QObject::connect(tes,SIGNAL(imageHeight(int)),spinbox_Yend,SLOT(setValue(int)));
-    QObject::connect(spinbox_Xstart,SIGNAL(valueChanged(int)),tes,SLOT(setGrabcut_Xbegin(int)));
-    QObject::connect(spinbox_Ystart,SIGNAL(valueChanged(int)),tes,SLOT(setGrabcut_Ybegin(int)));
-    QObject::connect(spinbox_Xend,SIGNAL(valueChanged(int)),tes,SLOT(setGrabcut_Xend(int)));
-    QObject::connect(spinbox_Yend,SIGNAL(valueChanged(int)),tes,SLOT(setGrabcut_Yend(int)));
-    QObject::connect(button_grabcut,SIGNAL(clicked()),tes,SLOT(applyGrabcut()));
-    QObject::connect(button_otsu,SIGNAL(clicked()),tes,SLOT(applyGrayOtsu()));
-    QObject::connect(button_file,SIGNAL(clicked()),tes,SLOT(openFilename()));
-    QObject::connect(button_overlay,SIGNAL(clicked()),tes,SLOT(drawOverlay()));
-    QObject::connect(button_rot,SIGNAL(clicked()),tes,SLOT(checkRuleofThird()));
-    //QObject::connect(button_exit,SIGNAL(clicked()),tes,SLOT(exit()));
-
-
+    QObject::connect(rule,SIGNAL(imageWidth(int)),spinbox_Xstart,SLOT(setValueMax(int)));
+    QObject::connect(rule,SIGNAL(imageWidth(int)),spinbox_Xend,SLOT(setValueMax(int)));
+    QObject::connect(rule,SIGNAL(imageHeight(int)),spinbox_Ystart,SLOT(setValueMax(int)));
+    QObject::connect(rule,SIGNAL(imageHeight(int)),spinbox_Yend,SLOT(setValueMax(int)));
+    QObject::connect(rule,SIGNAL(imageWidth(int)),spinbox_Xend,SLOT(setValue(int)));
+    QObject::connect(rule,SIGNAL(imageHeight(int)),spinbox_Yend,SLOT(setValue(int)));
+    QObject::connect(spinbox_Xstart,SIGNAL(valueChanged(int)),rule,SLOT(setGrabcut_Xbegin(int)));
+    QObject::connect(spinbox_Ystart,SIGNAL(valueChanged(int)),rule,SLOT(setGrabcut_Ybegin(int)));
+    QObject::connect(spinbox_Xend,SIGNAL(valueChanged(int)),rule,SLOT(setGrabcut_Xend(int)));
+    QObject::connect(spinbox_Yend,SIGNAL(valueChanged(int)),rule,SLOT(setGrabcut_Yend(int)));
+    QObject::connect(button_grabcut,SIGNAL(clicked()),rule,SLOT(applyGrabcut()));
+    QObject::connect(button_otsu,SIGNAL(clicked()),rule,SLOT(applyGrayOtsu()));
+    QObject::connect(button_file,SIGNAL(clicked()),rule,SLOT(openFilename()));
+    QObject::connect(button_overlay,SIGNAL(clicked()),rule,SLOT(drawOverlay()));
+    QObject::connect(button_rot,SIGNAL(clicked()),rule,SLOT(checkRuleofThird()));
 
     return a.exec();
 }

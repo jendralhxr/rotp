@@ -65,8 +65,7 @@ private:
     QMessageBox messagebox;
 
     //for sampling
-    double proportion,min_sample,trust,deviation,q,tpq;
-    double grab_populate,whole_populate;
+    double proportion,min_sample,trust,deviation,q,tpq,grab_populate,whole_populate;
 };
 
 #endif // ROTIMAGE_H

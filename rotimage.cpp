@@ -6,15 +6,14 @@
 #include <QDateTime>
 #include <QPen>
 #include <QPainter>
-#include <QMessageBox>
 #include <QString>
 
 #define MAX_WIDTH 640
 #define MAX_HEIGHT 640
-#define CENTROID_SAMPLE_COUNT 100
+//#define CENTROID_SAMPLE_COUNT 100
 #define OVERLAY_COLOR 0,0,200 // dead blue
 #define GRABCUT_COLOR 200,0,0 // dead red
-#define LINE_SCORE_GRADE -10
+//#define LINE_SCORE_GRADE -10
 
 using namespace cv;
 
@@ -26,8 +25,6 @@ ROTimage::ROTimage(QWidget *parent) : QLabel(parent)
 int ROTimage::openFilename(){
     image.release();
     tmp.release();
-    grabcut_xbegin = 0;
-    grabcut_ybegin = 0;
 
     image = imread(QFileDialog::getOpenFileName(this,tr("Open Image"), "./images",
                                                     tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
@@ -238,7 +235,7 @@ int ROTimage::checkRuleofThird(){
 
             //check rule of thirds point pass thru
             Scalar color = image.at<uchar>(intersect_x[i], intersect_y[i]);
-            if (color.val[0]==255 && color.val[0]==0){ // the pixel[temp] is white!!
+            if (color.val[0]==255 || color.val[0]==0){ // the pixel[temp] is white!!
                 painter.begin(&disp);
                 painter.setRenderHint(QPainter::Antialiasing, true);
                 painter.setBrush(QBrush(Qt::yellow, Qt::SolidPattern));
@@ -248,12 +245,7 @@ int ROTimage::checkRuleofThird(){
                 update();
 
                 qDebug("Rule Of Thirds: Yes. Pass thru at (%.2f, %.2f)",intersect_x[i],intersect_y[i]);
-//                    messagebox.setText(string.sprintf("Yes. At (%.2f, %.2f)",intersect_x[i],intersect_y[i]));
-//                    messagebox.exec();
-//                    return(0);
-                //qDebug("width is %d & height is %d",image.cols,image.rows);
-                //qDebug("grabcut populate is %f and minimum sample is %f and deviation is %f",grab_populate,min_sample,deviation);
-            }
+           }
 
             QPen pen;
             painter.begin(&disp);
@@ -318,13 +310,13 @@ int ROTimage::checkRuleofThird(){
 
             Scalar color = image.at<uchar>(intersect_x[i], intersect_y[i]);
             if (color.val[0]==255){ // the pixel[temp] is white!!
-//                painter.begin(&disp);
-//                painter.setRenderHint(QPainter::Antialiasing, true);
-//                painter.setBrush(QBrush(Qt::yellow, Qt::SolidPattern));
-//                painter.drawEllipse(intersect_x[i],intersect_y[i],10,10);
-//                painter.end();
-//                setPixmap(QPixmap::fromImage(disp));
-//                update();
+                painter.begin(&disp);
+                painter.setRenderHint(QPainter::Antialiasing, true);
+                painter.setBrush(QBrush(Qt::yellow, Qt::SolidPattern));
+                painter.drawEllipse(intersect_x[i],intersect_y[i],10,10);
+                painter.end();
+                setPixmap(QPixmap::fromImage(disp));
+                update();
 
             messagebox.setText(string.sprintf("Rule of Thirds: No. \
                                               \nCentroid is at coordinates (%.2f, %.2f). \
