@@ -66,7 +66,7 @@ private:
 
     //for sampling
     double proportion,min_sample,trust,deviation,q,tpq;
-    int grab_populate,whole_populate;
+    double grab_populate,whole_populate;
 };
 
 #endif // ROTIMAGE_H
