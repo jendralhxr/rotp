@@ -13,7 +13,7 @@ signals:
 
 public slots:
     void setValueMax(int val);
-
+    void resetValue();
 };
 
 #endif // ROTSPINBOX_H

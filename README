@@ -1,4 +1,4 @@
 Rule of Third checking for bitmap images using common algorithms:
 - Grabcut segmentation,
 - Otsu thresholding,
-- Monte Carlo averaging.
+- Monte Carlo method.

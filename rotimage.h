@@ -24,6 +24,7 @@ public:
 signals:
     void imageWidth(int width);
     void imageHeight(int height);
+    void newlyOpen();
 
 public slots:
     int openFilename();

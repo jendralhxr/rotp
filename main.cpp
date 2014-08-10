@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     ROTimage *rule = new ROTimage();
-//    tes->openFilename();
+    //    tes->openFilename();
 
     ROTSpinBox *spinbox_Xstart = new ROTSpinBox();
     ROTSpinBox *spinbox_Xend = new ROTSpinBox();
@@ -52,6 +52,8 @@ int main(int argc, char *argv[])
     QObject::connect(rule,SIGNAL(imageHeight(int)),spinbox_Yend,SLOT(setValueMax(int)));
     QObject::connect(rule,SIGNAL(imageWidth(int)),spinbox_Xend,SLOT(setValue(int)));
     QObject::connect(rule,SIGNAL(imageHeight(int)),spinbox_Yend,SLOT(setValue(int)));
+    QObject::connect(rule,SIGNAL(newlyOpen()),spinbox_Xstart,SLOT(resetValue()));
+    QObject::connect(rule,SIGNAL(newlyOpen()),spinbox_Ystart,SLOT(resetValue()));
     QObject::connect(spinbox_Xstart,SIGNAL(valueChanged(int)),rule,SLOT(setGrabcut_Xbegin(int)));
     QObject::connect(spinbox_Ystart,SIGNAL(valueChanged(int)),rule,SLOT(setGrabcut_Ybegin(int)));
     QObject::connect(spinbox_Xend,SIGNAL(valueChanged(int)),rule,SLOT(setGrabcut_Xend(int)));
@@ -61,6 +63,5 @@ int main(int argc, char *argv[])
     QObject::connect(button_file,SIGNAL(clicked()),rule,SLOT(openFilename()));
     QObject::connect(button_overlay,SIGNAL(clicked()),rule,SLOT(drawOverlay()));
     QObject::connect(button_rot,SIGNAL(clicked()),rule,SLOT(checkRuleofThird()));
-
     return a.exec();
 }

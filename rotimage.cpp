@@ -27,22 +27,22 @@ int ROTimage::openFilename(){
     tmp.release();
 
     image = imread(QFileDialog::getOpenFileName(this,tr("Open Image"), "./images",
-                                                    tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
-
+                                                tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
     if(!image.data || image.cols>MAX_WIDTH || image.rows>MAX_HEIGHT) {
         messagebox.setText("Image not found or image dimension is greater than 640x640 pixels");
-                                          messagebox.exec();
-                           return(0);
+        messagebox.exec();
+        return(0);
     }
     else{
         // centroid variables
-        intersect_x[4]=0, intersect_y[4]=0;
+        // intersect_x[4]=0, intersect_y[4]=0;
         centroid_x=0, centroid_y=0;
         x_accumulative=0, y_accumulative=0;
         x_temp=0, y_temp=0;
         count=0;
         //image_centro.release();
 
+        emit newlyOpen();
         emit imageWidth(image.cols);
         emit imageHeight(image.rows);
         intersect_x[0] = image.cols/3;   intersect_y[0] = image.rows/3;
@@ -93,9 +93,9 @@ void ROTimage::applyGrabcut(){
     catch(...)
     {
         messagebox.setText("Open an image first before apply grabcut segmentation \
-                                          or draw grabcut coordinates first");
-                                          messagebox.exec();
-                           return;
+                           or draw grabcut coordinates first");
+                           messagebox.exec();
+                return;
     }
 }
 
@@ -115,9 +115,9 @@ void ROTimage::applyGrayOtsu(){
     catch(...)
     {
         messagebox.setText("Open an image first or apply the grabcut \
-                                          segmentation first");
-                                          messagebox.exec();
-                           return;
+                           segmentation first");
+                           messagebox.exec();
+                return;
     }
 }
 
@@ -141,9 +141,9 @@ void ROTimage::drawOverlay(){
     catch(...)
     {
         messagebox.setText("Open an image first before use grabcut \
-                                          segmentation");
-                                          messagebox.exec();
-                           return;
+                           segmentation");
+                           messagebox.exec();
+                return;
     }
 }
 
@@ -224,7 +224,7 @@ int ROTimage::checkRuleofThird(){
         painter.begin(&disp);
         painter.setRenderHint(QPainter::Antialiasing, true);
         painter.setBrush(QBrush(Qt::red, Qt::SolidPattern));
-        painter.drawEllipse(centroid_x,centroid_y,10,10);
+        painter.drawEllipse(centroid_x-5,centroid_y-5,10,10);
         painter.end();
         setPixmap(QPixmap::fromImage(disp));
         update();
@@ -238,17 +238,17 @@ int ROTimage::checkRuleofThird(){
 
             //check rule of thirds intersection pass thru
             Scalar color = image.at<uchar>(intersect_x[i], intersect_y[i]);
-            if (color.val[0]==255 || color.val[0]==0){ // the pixel[temp] is white!!
+            if (color.val[0]==255){ // the pixel[temp] is white!!
                 painter.begin(&disp);
                 painter.setRenderHint(QPainter::Antialiasing, true);
                 painter.setBrush(QBrush(Qt::yellow, Qt::SolidPattern));
-                painter.drawEllipse(intersect_x[i],intersect_y[i],10,10);
+                painter.drawEllipse(intersect_x[i]-5,intersect_y[i]-5,10,10);
                 painter.end();
                 setPixmap(QPixmap::fromImage(disp));
                 update();
 
                 qDebug("Rule Of Thirds: Yes. Pass thru at (%.2f, %.2f)",intersect_x[i],intersect_y[i]);
-           }
+            }
 
             QPen pen;
             painter.begin(&disp);
@@ -274,7 +274,7 @@ int ROTimage::checkRuleofThird(){
                                                       \nScore %d.",
                                                       centroid_x, centroid_y,intersect_x[i],intersect_y[i],grab_populate, \
                                                       min_sample, distance_hypotenuse, score[j]));
-//                                                      centroid_x, centroid_y, count,population, distance, score[j]));
+                    //                                                      centroid_x, centroid_y, count,population, distance, score[j]));
                     messagebox.exec();
                     return(0);
                 }
@@ -282,32 +282,32 @@ int ROTimage::checkRuleofThird(){
         }
 
         // rule of thirds check, line rule
-//        for (int i=0; i<4; i++){
-//            switch (i) {
-//            case 1:
-//                distance = abs(centroid_x-image.cols/3);
-//                break;
-//            case 2:
-//                distance = abs(centroid_x-2*image.cols/3);
-//                break;
-//            case 3:
-//                distance = abs(centroid_y-image.rows/3);
-//                break;
-//            case 4:
-//                distance = abs(centroid_y-2*image.rows/3);
-//                break;
-//            }
-//            for (int j=0; j<8; j++){
-//                if (distance < tolerance[j]*hypotenuse){
-//                    messagebox.setText(string.sprintf("Rule of Thirds: Yes (Line Rule). \
-//                                                      \nCentroid is at coordinates (%.2f, %.2f). Sample count: %d/%d\
-//                                                      \nDistance from nearest line is %.2f Pixel(s). Score %d.",
-//                                                      centroid_x, centroid_y, count, population, distance, score[j]+LINE_SCORE_GRADE));
-//                    messagebox.exec();
-//                    return(0);
-//                }
-//            }
-//        }
+        //        for (int i=0; i<4; i++){
+        //            switch (i) {
+        //            case 1:
+        //                distance = abs(centroid_x-image.cols/3);
+        //                break;
+        //            case 2:
+        //                distance = abs(centroid_x-2*image.cols/3);
+        //                break;
+        //            case 3:
+        //                distance = abs(centroid_y-image.rows/3);
+        //                break;
+        //            case 4:
+        //                distance = abs(centroid_y-2*image.rows/3);
+        //                break;
+        //            }
+        //            for (int j=0; j<8; j++){
+        //                if (distance < tolerance[j]*hypotenuse){
+        //                    messagebox.setText(string.sprintf("Rule of Thirds: Yes (Line Rule). \
+        //                                                      \nCentroid is at coordinates (%.2f, %.2f). Sample count: %d/%d\
+        //                                                      \nDistance from nearest line is %.2f Pixel(s). Score %d.",
+        //                                                      centroid_x, centroid_y, count, population, distance, score[j]+LINE_SCORE_GRADE));
+        //                    messagebox.exec();
+        //                    return(0);
+        //                }
+        //            }
+        //        }
 
         for (int i=0; i<4; i++){
 
@@ -321,20 +321,20 @@ int ROTimage::checkRuleofThird(){
                 setPixmap(QPixmap::fromImage(disp));
                 update();
 
-            messagebox.setText(string.sprintf("Rule of Thirds: No. \
-                                              \nCentroid is at coordinates (%.2f, %.2f). \
-                                              \nPass thru rule of thirds point at (%.2f, %.2f). \
-                                              \nPopulation in grabcut area is %.0f. \
-                                              \nNumber of sample is %.0f. \
-                                              \nDistance from nearest intersection is %.2f Pixel(s). \
-                                              \nScore %d.",
-                                              centroid_x, centroid_y,intersect_x[i],intersect_y[i],grab_populate, \
-                                              min_sample, distance_hypotenuse, score[8]));
-            messagebox.exec();
-            return(0);
+                messagebox.setText(string.sprintf("Rule of Thirds: No. \
+                                                  \nCentroid is at coordinates (%.2f, %.2f). \
+                                                  \nPass thru rule of thirds point at (%.2f, %.2f). \
+                                                  \nPopulation in grabcut area is %.0f. \
+                                                  \nNumber of sample is %.0f. \
+                                                  \nDistance from nearest intersection is %.2f Pixel(s). \
+                                                  \nScore %d.",
+                                                  centroid_x, centroid_y,intersect_x[i],intersect_y[i],grab_populate, \
+                                                  min_sample, distance_hypotenuse, score[8]));
+                messagebox.exec();
+                return(0);
             }
+        }
     }
-}
 
     catch(...){
         messagebox.setText("Open an image first before use grabcut segmentation");

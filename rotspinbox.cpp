@@ -8,3 +8,7 @@ ROTSpinBox::ROTSpinBox(QWidget *parent) :
 void ROTSpinBox::setValueMax(int val){
     setMaximum(val);
 }
+
+void ROTSpinBox::resetValue(){
+    setValue(0);
+}
