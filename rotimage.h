@@ -28,7 +28,7 @@ signals:
 public slots:
     int openFilename();
     void drawOverlay();
-    void drawGrabcut();
+    void drawGrabcutBoundary();
     void applyGrabcut();
     void applyGrayOtsu();
     void renderImage();
@@ -53,14 +53,13 @@ private:
     // centroid variables
     double intersect_x[4], intersect_y[4];
     double centroid_x, centroid_y;
-    // Mat -> QImage -> QLabel render
-    Mat image, tmp, image_centro;
+    Mat image, tmp;// image_centro;
     QImage disp;
     QPainter painter;
     double x_accumulative, y_accumulative;
-    int x_temp, y_temp;
-    int count, population;
-    //int populate;
+    double x_temp, y_temp;
+    double image_hypotenuse, distance_hypotenuse;
+    int count;//, population;
     QString string;
     QMessageBox messagebox;
 

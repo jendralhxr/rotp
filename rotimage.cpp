@@ -3,7 +3,7 @@
 #include <math.h>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QDateTime>
+//#include <QDateTime>
 #include <QPen>
 #include <QPainter>
 #include <QString>
@@ -30,8 +30,7 @@ int ROTimage::openFilename(){
                                                     tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
 
     if(!image.data || image.cols>MAX_WIDTH || image.rows>MAX_HEIGHT) {
-        messagebox.setText(string.sprintf("Image not found or image dimension is \
-                                          greater than 640x640 pixels"));
+        messagebox.setText("Image not found or image dimension is greater than 640x640 pixels");
                                           messagebox.exec();
                            return(0);
     }
@@ -42,7 +41,7 @@ int ROTimage::openFilename(){
         x_accumulative=0, y_accumulative=0;
         x_temp=0, y_temp=0;
         count=0;
-        image_centro.release();
+        //image_centro.release();
 
         emit imageWidth(image.cols);
         emit imageHeight(image.rows);
@@ -65,6 +64,7 @@ void ROTimage::renderImage(){
         break;
     }
     assert(tmp.isContinuous());
+
     disp = QImage(tmp.data, tmp.cols, tmp.rows, tmp.cols*3, QImage::Format_RGB888);
     setPixmap(QPixmap::fromImage(disp));
     update();
@@ -92,8 +92,8 @@ void ROTimage::applyGrabcut(){
 
     catch(...)
     {
-        messagebox.setText(string.sprintf("Open an image first before apply grabcut segmentation \
-                                          or draw grabcut coordinates first"));
+        messagebox.setText("Open an image first before apply grabcut segmentation \
+                                          or draw grabcut coordinates first");
                                           messagebox.exec();
                            return;
     }
@@ -114,8 +114,8 @@ void ROTimage::applyGrayOtsu(){
 
     catch(...)
     {
-        messagebox.setText(string.sprintf("Open an image first or apply the grabcut \
-                                          segmentation first"));
+        messagebox.setText("Open an image first or apply the grabcut \
+                                          segmentation first");
                                           messagebox.exec();
                            return;
     }
@@ -140,14 +140,14 @@ void ROTimage::drawOverlay(){
 
     catch(...)
     {
-        messagebox.setText(string.sprintf("Open an image first before use grabcut \
-                                          segmentation"));
+        messagebox.setText("Open an image first before use grabcut \
+                                          segmentation");
                                           messagebox.exec();
                            return;
     }
 }
 
-void ROTimage::drawGrabcut(){
+void ROTimage::drawGrabcutBoundary(){
 
     renderImage();
     QPen pen;
@@ -168,28 +168,29 @@ void ROTimage::drawGrabcut(){
 void ROTimage::setGrabcut_Xbegin(int pixel){
     grabcut_xbegin = pixel;
     grabcut_rect.x = grabcut_xbegin;
-    drawGrabcut();
+    drawGrabcutBoundary();
 }
 
 void ROTimage::setGrabcut_Ybegin(int pixel){
     grabcut_ybegin = pixel;
     grabcut_rect.y = grabcut_ybegin;
-    drawGrabcut();
+    drawGrabcutBoundary();
 }
 
 void ROTimage::setGrabcut_Xend(int pixel){
     grabcut_xend = pixel;
     grabcut_rect.width = grabcut_xend-grabcut_xbegin;
-    drawGrabcut();
+    drawGrabcutBoundary();
 }
 
 void ROTimage::setGrabcut_Yend(int pixel){
     grabcut_yend = pixel;
     grabcut_rect.height = grabcut_yend-grabcut_ybegin;
-    drawGrabcut();
+    drawGrabcutBoundary();
 }
 
 int ROTimage::checkRuleofThird(){
+
     //sampling size formula
     grab_populate = (grabcut_xend-grabcut_xbegin)*(grabcut_yend-grabcut_ybegin);
     whole_populate = image.cols*image.rows;
@@ -203,19 +204,21 @@ int ROTimage::checkRuleofThird(){
 
     try
     {
-        while(count<min_sample){
-            population++;
+        //centroid determine formula
+        while(count<=min_sample){
+            //population++;
             x_temp = grabcut_xbegin + rand()%(grabcut_xend-grabcut_xbegin);
             y_temp = grabcut_ybegin + rand()%(grabcut_yend-grabcut_ybegin);
             Scalar color = image.at<uchar>(y_temp, x_temp);
             if (color.val[0]==255){ // the pixel[temp] is white!!
-                x_accumulative = x_accumulative + double(x_temp);
-                y_accumulative = y_accumulative + double(y_temp);
+                x_accumulative = x_accumulative + x_temp;
+                y_accumulative = y_accumulative + y_temp;
                 count++;
             }
         }
-        centroid_x = x_accumulative/ (double) min_sample;
-        centroid_y = y_accumulative/ (double) min_sample;
+        //averaging the accumulative result with the number of sample
+        centroid_x = x_accumulative/min_sample;
+        centroid_y = y_accumulative/min_sample;
 
         //draw centroid mark
         painter.begin(&disp);
@@ -227,13 +230,13 @@ int ROTimage::checkRuleofThird(){
         update();
 
         qDebug("Centroid (x,y): %f %f",centroid_x,centroid_y);
-        double hypotenuse = sqrt(pow(image.cols,2) + pow(image.rows,2));
-        double distance;
+
+        image_hypotenuse = sqrt(pow(image.cols,2) + pow(image.rows,2));
 
         // rule of thirds check, intersection rule
         for (int i=0; i<4; i++){
 
-            //check rule of thirds point pass thru
+            //check rule of thirds intersection pass thru
             Scalar color = image.at<uchar>(intersect_x[i], intersect_y[i]);
             if (color.val[0]==255 || color.val[0]==0){ // the pixel[temp] is white!!
                 painter.begin(&disp);
@@ -259,18 +262,18 @@ int ROTimage::checkRuleofThird(){
             update();
 
             for (int j=0; j<8; j++){
-                distance = sqrt(pow(centroid_x-intersect_x[i],2)+pow(centroid_y-intersect_y[i],2));
+                distance_hypotenuse = sqrt(pow(centroid_x-intersect_x[i],2)+pow(centroid_y-intersect_y[i],2));
 
-                if (distance < tolerance[j]*hypotenuse){
+                if (distance_hypotenuse < tolerance[j]*image_hypotenuse){
                     messagebox.setText(string.sprintf("Rule of Thirds: Yes. \
                                                       \nCentroid is at coordinates (%.2f, %.2f). \
-                                                      \nPass thru rule of thirds point at (%.2f, %.2f) \
+                                                      \nPass thru rule of thirds point at (%.2f, %.2f). \
                                                       \nPopulation in grabcut area is %.0f. \
                                                       \nNumber of sample is %.0f. \
                                                       \nDistance from nearest intersection is %.2f Pixel(s). \
                                                       \nScore %d.",
                                                       centroid_x, centroid_y,intersect_x[i],intersect_y[i],grab_populate, \
-                                                      min_sample, distance, score[j]));
+                                                      min_sample, distance_hypotenuse, score[j]));
 //                                                      centroid_x, centroid_y, count,population, distance, score[j]));
                     messagebox.exec();
                     return(0);
@@ -309,7 +312,7 @@ int ROTimage::checkRuleofThird(){
         for (int i=0; i<4; i++){
 
             Scalar color = image.at<uchar>(intersect_x[i], intersect_y[i]);
-            if (color.val[0]==255){ // the pixel[temp] is white!!
+            if (color.val[0]==255 || color.val[0]==0){ // the pixel[temp] is white!!
                 painter.begin(&disp);
                 painter.setRenderHint(QPainter::Antialiasing, true);
                 painter.setBrush(QBrush(Qt::yellow, Qt::SolidPattern));
@@ -320,13 +323,13 @@ int ROTimage::checkRuleofThird(){
 
             messagebox.setText(string.sprintf("Rule of Thirds: No. \
                                               \nCentroid is at coordinates (%.2f, %.2f). \
-                                              \nPass thru rule of thirds point at (%.2f, %.2f) \
+                                              \nPass thru rule of thirds point at (%.2f, %.2f). \
                                               \nPopulation in grabcut area is %.0f. \
                                               \nNumber of sample is %.0f. \
                                               \nDistance from nearest intersection is %.2f Pixel(s). \
                                               \nScore %d.",
                                               centroid_x, centroid_y,intersect_x[i],intersect_y[i],grab_populate, \
-                                              min_sample, distance, score[8]));
+                                              min_sample, distance_hypotenuse, score[8]));
             messagebox.exec();
             return(0);
             }
@@ -334,7 +337,7 @@ int ROTimage::checkRuleofThird(){
 }
 
     catch(...){
-        messagebox.setText(string.sprintf("Open an image first before use grabcut segmentation"));
+        messagebox.setText("Open an image first before use grabcut segmentation");
         messagebox.exec();
         return(0);
     }
