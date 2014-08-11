@@ -3,7 +3,7 @@
 #include <math.h>
 #include <QFileDialog>
 #include <QMessageBox>
-//#include <QDateTime>
+#include <QDateTime>
 #include <QPen>
 #include <QPainter>
 #include <QString>
@@ -205,10 +205,12 @@ int ROTimage::checkRuleofThird(){
     try
     {
         //centroid determine formula
+        srand(QDateTime::currentMSecsSinceEpoch());
         while(count<=min_sample){
-            //population++;
+
             x_temp = grabcut_xbegin + rand()%(grabcut_xend-grabcut_xbegin);
             y_temp = grabcut_ybegin + rand()%(grabcut_yend-grabcut_ybegin);
+            //qDebug("xtemp = %f and ytemp = %f",x_temp,y_temp);
             Scalar color = image.at<uchar>(y_temp, x_temp);
             if (color.val[0]==255){ // the pixel[temp] is white!!
                 x_accumulative = x_accumulative + x_temp;
