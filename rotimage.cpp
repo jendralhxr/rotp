@@ -10,7 +10,6 @@
 
 #define MAX_WIDTH 640
 #define MAX_HEIGHT 640
-//#define CENTROID_SAMPLE_COUNT 100
 #define OVERLAY_COLOR 0,0,200 // dead blue
 #define GRABCUT_COLOR 200,0,0 // dead red
 //#define LINE_SCORE_GRADE -10
@@ -35,12 +34,11 @@ int ROTimage::openFilename(){
     }
     else{
         // centroid variables
-        // intersect_x[4]=0, intersect_y[4]=0;
+        intersect_x[4]={ }, intersect_y[4]={ };
         centroid_x=0, centroid_y=0;
         x_accumulative=0, y_accumulative=0;
         x_temp=0, y_temp=0;
         count=0;
-        //image_centro.release();
 
         emit newlyOpen();
         emit imageWidth(image.cols);
@@ -189,7 +187,7 @@ void ROTimage::setGrabcut_Yend(int pixel){
     drawGrabcutBoundary();
 }
 
-int ROTimage::checkRuleofThird(){
+int ROTimage::checkRuleofThirds(){
 
     //sampling size formula
     grab_populate = (grabcut_xend-grabcut_xbegin)*(grabcut_yend-grabcut_ybegin);
@@ -206,7 +204,7 @@ int ROTimage::checkRuleofThird(){
     {
         //centroid determine formula
         srand(QDateTime::currentMSecsSinceEpoch());
-        while(count<=min_sample){
+        while(count <= min_sample){
 
             x_temp = grabcut_xbegin + rand()%(grabcut_xend-grabcut_xbegin);
             y_temp = grabcut_ybegin + rand()%(grabcut_yend-grabcut_ybegin);
@@ -314,7 +312,7 @@ int ROTimage::checkRuleofThird(){
         for (int i=0; i<4; i++){
 
             Scalar color = image.at<uchar>(intersect_x[i], intersect_y[i]);
-            if (color.val[0]==255 || color.val[0]==0){ // the pixel[temp] is white!!
+            if (color.val[0]==255){ // the pixel[temp] is white!!
                 painter.begin(&disp);
                 painter.setRenderHint(QPainter::Antialiasing, true);
                 painter.setBrush(QBrush(Qt::yellow, Qt::SolidPattern));

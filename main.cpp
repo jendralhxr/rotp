@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     ROTimage *rule = new ROTimage();
-    //    tes->openFilename();
 
     ROTSpinBox *spinbox_Xstart = new ROTSpinBox();
     ROTSpinBox *spinbox_Xend = new ROTSpinBox();
@@ -62,6 +61,6 @@ int main(int argc, char *argv[])
     QObject::connect(button_otsu,SIGNAL(clicked()),rule,SLOT(applyGrayOtsu()));
     QObject::connect(button_file,SIGNAL(clicked()),rule,SLOT(openFilename()));
     QObject::connect(button_overlay,SIGNAL(clicked()),rule,SLOT(drawOverlay()));
-    QObject::connect(button_rot,SIGNAL(clicked()),rule,SLOT(checkRuleofThird()));
+    QObject::connect(button_rot,SIGNAL(clicked()),rule,SLOT(checkRuleofThirds()));
     return a.exec();
 }

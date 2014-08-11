@@ -37,8 +37,7 @@ public slots:
     void setGrabcut_Ybegin(int pixel);
     void setGrabcut_Xend(int pixel);
     void setGrabcut_Yend(int pixel);
-    int checkRuleofThird();
-    //void exit();
+    int checkRuleofThirds();
 
 private:
     //for tolerance and scoring
