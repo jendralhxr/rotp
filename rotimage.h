@@ -41,8 +41,8 @@ public slots:
 
 private:
     //for tolerance and scoring
-    double tolerance[8] = {0.001, 0.008, 0.020, 0.030, 0.045, 0.060, 0.090, 0.100};
-    int score[9] = {100, 95, 90, 85, 80, 75, 60, 50, 0};
+	double tolerance[8];
+	int score[9];
 
     // for grabcut
     Mat result; // segmentation result (4 possible values)

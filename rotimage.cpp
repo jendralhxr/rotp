@@ -25,6 +25,25 @@ int ROTimage::openFilename(){
     image.release();
     tmp.release();
 
+	tolerance[0] = 0.001;
+	tolerance[1] = 0.008;
+	tolerance[2] = 0.020;
+	tolerance[3] = 0.030;
+	tolerance[4] = 0.045;
+	tolerance[5] = 0.060;
+	tolerance[6] = 0.090;
+	tolerance[7] = 0.100;
+
+	score[0] = 100;
+	score[1] = 95;
+	score[2] = 90;
+	score[3] = 85;
+	score[4] = 80;
+	score[5] = 75;
+	score[6] = 60;
+	score[7] = 50;
+	score[8] = 0;
+
     image = imread(QFileDialog::getOpenFileName(this,tr("Open Image"), "./images",
                                                 tr("Image Files (*.jpeg; *.jpg; *.bmp; *.png)")).toStdString());
     if(!image.data || image.cols>MAX_WIDTH || image.rows>MAX_HEIGHT) {
